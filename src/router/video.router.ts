@@ -1,18 +1,10 @@
+
 import {Router} from 'restify-router'
-
+import execSpawn from '../utils/utils'
 const videoRoute = new Router()
-const { spawn } = require('node:child_process');
 
-//Prueba
-videoRoute.get('/session', async( req, res)=>{
-    try {
 
-        
-        
-    } catch (error) {
-        return res.json({succes: false, error: true})
-    }
-})
+
 
 
 //transform/webmtomp4
@@ -21,22 +13,11 @@ videoRoute.get('/transform/webmtomp4', async( req, res)=>{
 
         let arg=[
             '-i',
-            'videos/videowebm.webm',
-            'videoResult/videowebm.mp4'
+            'public/videos/videowebm.webm',
+            'public/videoResult/videowebm.mp4'
         ]
         
-        const ls = spawn('ffmpeg',arg);
-        ls.stdout.on('data', (data: any) => {
-            console.log(`stdout: ${data}`);
-        });
-        
-        ls.stderr.on('data', (data: any) => {
-            console.error(`stderr: ${data}`);
-        });
-        
-        ls.on('close', (code: any) => {
-            console.log(`child process exited with code ${code}`);
-        });         
+        execSpawn(arg)               
         
     } catch (error) {
         return res.json({succes: false, error: true})
@@ -49,22 +30,11 @@ videoRoute.get('/transform/mp4towebm', async( req, res)=>{
 
         let arg=[
             '-i',
-            'videos/videomp4.mp4',
-            'videoResult/videomp4.webm'
+            'public/videos/videomp4.mp4',
+            'public/videoResult/videomp4.webm'
         ]
         
-        const ls = spawn('ffmpeg',arg);
-        ls.stdout.on('data', (data: any) => {
-            console.log(`stdout: ${data}`);
-        });
-        
-        ls.stderr.on('data', (data: any) => {
-            console.error(`stderr: ${data}`);
-        });
-        
-        ls.on('close', (code: any) => {
-            console.log(`child process exited with code ${code}`);
-        }); 
+        execSpawn(arg) 
         
         
     } catch (error) {
@@ -76,28 +46,26 @@ videoRoute.get('/transform/mp4towebm', async( req, res)=>{
 videoRoute.get('/transform/mutevideos', async( req, res)=>{
     try {
 
-        let arg=[
-            '-i',
-            'videos/videomp4.mp4',
-            '-c:v',
-            'copy',
-            '-an',
-            'videoResult/muted.mp4'
-
+        let videoNames = [
+            { nameVideo: 'videomp4.mp4', nameVideoMute: 'mutevideomp4.mp4' },
+            { nameVideo: 'videowebm.webm', nameVideoMute: 'mutevideowebm.webm' }
         ]
-        
-        const ls = spawn('ffmpeg',arg);
-        ls.stdout.on('data', (data: any) => {
-            console.log(`stdout: ${data}`);
-        });
-        
-        ls.stderr.on('data', (data: any) => {
-            console.error(`stderr: ${data}`);
-        });
-        
-        ls.on('close', (code: any) => {
-            console.log(`child process exited with code ${code}`);
-        }); 
+
+        videoNames.map((d) => {
+
+
+            let arg = [
+                '-i',
+                `public/videos/${d.nameVideo}`,
+                '-c:v',
+                'copy',
+                '-an',
+                `public/videoResult/${d.nameVideoMute}`
+            ]
+
+            execSpawn(arg)
+
+        })
         
     } catch (error) {
         return res.json({succes: false, error: true})
